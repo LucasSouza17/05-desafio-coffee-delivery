@@ -1,21 +1,32 @@
 import "react-native-gesture-handler";
 
+import { useEffect, useState } from "react";
 import { StatusBar } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import * as SplashScreen from 'expo-splash-screen';
+
+import { useFonts } from "expo-font";
 import { Roboto_400Regular, Roboto_700Bold } from "@expo-google-fonts/roboto";
 import { Baloo2_700Bold } from "@expo-google-fonts/baloo-2";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 import { Routes } from "./src/routes";
-import { Loading } from "./src/components/Loading";
-import { useFonts } from "expo-font";
 import { Splash } from "./src/components/Splash";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
+
+SplashScreen.preventAutoHideAsync();
 
 export default function App() {
   const [fontsLoaded] = useFonts({ Roboto_400Regular, Roboto_700Bold, Baloo2_700Bold });
+  const [splashLoaded, setSplashLoaded] = useState(false);
 
-  if (fontsLoaded) {
-    // return <Loading />;
-    return <Splash />;
+  useEffect(() => {
+    if (fontsLoaded) {
+      SplashScreen.hideAsync();
+    }
+  }, [fontsLoaded]);
+
+  if (!fontsLoaded || !splashLoaded) {
+    return <Splash onFinished={(isFinished) => setSplashLoaded(isFinished)} />;
   }
 
   return (
