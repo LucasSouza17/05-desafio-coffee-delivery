@@ -1,5 +1,5 @@
 import {View} from 'react-native'
-import Animated, { Extrapolate, FadeInUp, Keyframe, SharedValue, SlideInDown, SlideInUp, interpolate, interpolateColor, useAnimatedStyle } from "react-native-reanimated";
+import Animated, { Extrapolate, SharedValue, interpolate, interpolateColor, useAnimatedStyle } from "react-native-reanimated";
 
 import { MapPin } from "phosphor-react-native";
 import { Cart } from '../Cart';
@@ -33,9 +33,8 @@ export function Header({animatedScrollY}: Props) {
     }
   })
 
-
   return (
-    <Animated.View style={[styles.container, containerStylesAnimated]} entering={FadeInUp.duration(200)}>
+    <Animated.View style={[styles.container, containerStylesAnimated]}>
     <View style={styles.content}>
       <View style={styles.locationContainer}>
         <MapPin size={17.5} weight="fill" color={THEME.COLORS.BRAND_PURPLE} />

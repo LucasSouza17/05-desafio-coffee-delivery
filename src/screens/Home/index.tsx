@@ -1,4 +1,4 @@
-import { View, Text, TextInput, Image } from "react-native";
+import { View, Text, TextInput, Image, FlatList } from "react-native";
 import Animated, {
   FadeInUp,
   Keyframe,
@@ -10,14 +10,19 @@ import Animated, {
   useSharedValue,
 } from "react-native-reanimated";
 
-import { styles } from "./styles";
 import { Header } from "../../components/Header";
+import { Input } from "../../components/Input";
+
 import { THEME } from "../../styles/theme";
+import { styles } from "./styles";
 
 import CoffeeBeans from "../../assets/coffeebeans.png";
-import { useEffect } from "react";
+import { useState } from "react";
+import { COFFEES_HIGHTLIGHT } from "../../data/coffeesHightlight";
 
 export function Home() {
+  const [search, setSearch] = useState<string>("");
+
   const scrollY = useSharedValue(0);
 
   const scrollHandler = useAnimatedScrollHandler({
@@ -26,17 +31,7 @@ export function Home() {
     },
   });
 
-  const keyframeEntering = new Keyframe({
-    from: {
-      height: 0
-    },
-    to: {
-      height: 266
-    }
-  })
-
   const searchContainerStylesAnimated = useAnimatedStyle(() => {
-    console.log(scrollY.value)
     return {
       backgroundColor: interpolateColor(
         scrollY.value,
@@ -48,29 +43,75 @@ export function Home() {
 
   return (
     <View style={styles.container}>
+      {/* Header (Localização & Carrinho) */}
       <Header animatedScrollY={scrollY} />
+
       <Animated.ScrollView onScroll={scrollHandler} scrollEventThrottle={16}>
-        <Animated.View style={[styles.searchContainer, searchContainerStylesAnimated]} entering={FadeInUp.duration(300)}>
+        {/* Seção de pesquisa */}
+        <Animated.View
+          style={[styles.searchContainer, searchContainerStylesAnimated]}
+        >
           <Text style={styles.searchTitle}>
             Encontre o café perfeito para qualquer hora do dia
           </Text>
-          <View style={{position: "relative"}}>
-            <TextInput
-              style={{
-                height: 42,
-                backgroundColor: THEME.COLORS.BASE_GRAY_200,
-                borderRadius: 4,
-                paddingLeft: 8,
-              }}
+          <View style={{ position: "relative" }}>
+            <Input
               placeholder="Pesquisar"
-              placeholderTextColor={THEME.COLORS.BASE_GRAY_400}
+              value={search}
+              onChangeText={(text) => setSearch(text)}
             />
-            <Image source={CoffeeBeans} style={{ position: "absolute", bottom: -82, right: -32, width: 82, height: 82 }} />
+            <Image source={CoffeeBeans} style={styles.coffeeBeansImage} />
           </View>
         </Animated.View>
 
-        <View style={{width: 100, height: 250, backgroundColor: "#000"}} />
-        <View style={{width: 100, height: 1500, backgroundColor: "#045923"}} />
+        <FlatList
+          data={COFFEES_HIGHTLIGHT}
+          keyExtractor={(item) => String(item.id)}
+          horizontal
+          style={{ marginTop: -170 }}
+          contentContainerStyle={{ gap: 8, marginLeft: 32 }}
+          renderItem={({ item }) => {
+            return (
+              <View style={{alignItems: 'center'}}>
+                <Image
+                  source={item.image}
+                  style={{
+                    width: 120,
+                    height: 120,
+                    marginTop: 0,
+                    zIndex: 100,
+                    top: 90
+                  }}
+                />
+                <View
+                  style={{
+                    position: "relative",
+                    paddingHorizontal: 16,
+                    paddingBottom: 20,
+                    borderTopLeftRadius: 6,
+                    borderBottomRightRadius: 6,
+                    borderTopRightRadius: 36,
+                    borderBottomLeftRadius: 36,
+                    backgroundColor: "#FFF",
+                    width: 208,
+                    height: 262,
+                    alignItems: "center",
+                    paddingTop: 90
+                  }}
+                >
+                  <Text style={{ textAlign: "center", marginTop: 16 }}>
+                    Café expresso com o dobro de leite e espuma cremosa
+                  </Text>
+                </View>
+              </View>
+            );
+          }}
+        />
+
+        <View style={{ width: 100, height: 250, marginTop: 16, backgroundColor: "#000" }} />
+        <View
+          style={{ width: 100, height: 1500, backgroundColor: "#045923" }}
+        />
       </Animated.ScrollView>
     </View>
   );

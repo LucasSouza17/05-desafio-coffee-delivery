@@ -6,16 +6,27 @@ export const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: THEME.COLORS.BASE_GRAY_900,
   },
+
+  // Seção de pesquisa
   searchContainer: {
     paddingTop: 20,
     gap: 15,
     paddingHorizontal: 32,
-    paddingBottom: 137
+    paddingBottom: 137,
   },
   searchTitle: {
     fontSize: 20,
-    fontFamily: 'Baloo2_700Bold',
+    fontFamily: "Baloo2_700Bold",
     lineHeight: 24,
-    color: THEME.COLORS.BASE_WHITE
-  }
+    color: THEME.COLORS.BASE_WHITE,
+  },
+  coffeeBeansImage: {
+    position: "absolute",
+    bottom: -82,
+    right: -32,
+    width: 82,
+    height: 82,
+  },
+
+  
 });
