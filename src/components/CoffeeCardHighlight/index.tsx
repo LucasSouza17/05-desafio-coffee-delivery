@@ -1,18 +1,19 @@
-import { Image, Text, View } from "react-native";
+import { View } from "react-native";
 import { CoffeeData } from "../../@types/coffee";
 import { styles } from "./styles";
 import Animated, {
+  Easing,
   Extrapolate,
   SharedValue,
+  SlideInLeft,
   interpolate,
   useAnimatedStyle,
-  useSharedValue,
-  withSpring,
   withTiming,
 } from "react-native-reanimated";
-import { useEffect } from "react";
-import { Dimensions } from "react-native";
-import { THEME } from "../../styles/theme";
+import { Tag } from "../Tag";
+import { CoffeeTitle } from "../CoffeeTitle";
+import { CoffeeDescription } from "../CoffeeDescription";
+import { CoffeePrice } from "../CoffeePrice";
 
 type Props = {
   coffee: CoffeeData;
@@ -21,13 +22,13 @@ type Props = {
 };
 
 export function CoffeeCardHighlight({ coffee, index, scrollX }: Props) {
-  const inputRange = [(index - 1) * 176, index * 176, (index + 1) * 176];
+  const inputRange = [(index - 1) * 160, index * 160, (index + 1) * 160];
 
   const containerAnimatedStyles = useAnimatedStyle(() => {
     return {
       transform: [
         {
-          scale: interpolate(scrollX.value, inputRange, [0.80, 1, 0.80]),
+          scale: withTiming(interpolate(scrollX.value, inputRange, [0.80, 1, 0.80], Extrapolate.CLAMP), {duration: 50, easing: Easing.ease}),
         },
       ],
     };
@@ -35,9 +36,9 @@ export function CoffeeCardHighlight({ coffee, index, scrollX }: Props) {
 
   const imageAnimatedStyles = useAnimatedStyle(() => {
     return {
-      width: interpolate(scrollX.value, inputRange, [64, 120, 64]),
-      height: interpolate(scrollX.value, inputRange, [64, 120, 64]),
-      marginTop: interpolate(scrollX.value, inputRange, [-15, -40, -15]),
+      width: withTiming(interpolate(scrollX.value, inputRange, [64, 120, 64], Extrapolate.CLAMP), {duration: 400}),
+      height:  withTiming(interpolate(scrollX.value, inputRange, [64, 120, 64], Extrapolate.CLAMP),{duration: 400}),
+      marginTop:  withTiming(interpolate(scrollX.value, inputRange, [-15, -40, -15], Extrapolate.CLAMP), {duration: 600}),
     };
   });
 
@@ -45,20 +46,15 @@ export function CoffeeCardHighlight({ coffee, index, scrollX }: Props) {
     <Animated.View style={[styles.container, containerAnimatedStyles]}>
       <Animated.Image source={coffee.image} style={[styles.image, imageAnimatedStyles]} />
 
-      <View style={{marginTop: 8, alignItems: 'center'}}>
-        <View style={{borderRadius: 50, paddingHorizontal: 8, paddingVertical: 4, backgroundColor: THEME.COLORS.BRAND_PURPLE_LIGHT, alignSelf: 'center'}}>
-          <Text style={{fontFamily: THEME.FONTS.BOLD_ROBOTO, fontSize: 10, fontWeight: "700", color: THEME.COLORS.BRAND_PURPLE_DARK}}>{coffee.type_label}</Text>
-        </View>
+      <View style={styles.content}>
+        <Tag label={coffee.type_label} />
         
-        <View style={{marginTop: 14, gap: 4, alignItems: 'center'}}>
-          <Text style={{fontSize: 20, fontFamily: THEME.FONTS.BOLD_BALOO2, color: THEME.COLORS.BASE_GRAY_200, textAlign: 'center', lineHeight: 24}}>{coffee.title}</Text>
-          <Text style={{fontSize: 12, fontFamily: THEME.FONTS.REGULAR, color: THEME.COLORS.BASE_GRAY_400, textAlign: 'center'}}>{coffee.description}</Text>
+        <View style={styles.textsContainer}>
+          <CoffeeTitle label={coffee.title} textAlign="center" />
+          <CoffeeDescription label={coffee.description} textAlign="center" />
         </View>
 
-        <View style={{flexDirection: 'row', alignItems: 'baseline', marginTop: 18, gap: 2}}>
-          <Text style={{fontSize: 14, fontFamily: THEME.FONTS.REGULAR, color: THEME.COLORS.BRAND_YELLOW_DARK}}>R$</Text>
-          <Text style={{fontSize: 24, fontFamily: THEME.FONTS.BOLD_BALOO2, color: THEME.COLORS.BRAND_YELLOW_DARK}}>{coffee.price}0</Text>
-        </View>
+        <CoffeePrice price={coffee.price} />
       </View>
     </Animated.View>
   );

@@ -1,17 +1,17 @@
-import TradicionalImage from "../assets/expresso.png";
+import CremosoImage from "../assets/cremoso.png";
 import CapuccinoImage from "../assets/capuccino.png";
 import CubanoImage from "../assets/cubano.png";
 
 export const COFFEES_HIGHTLIGHT = [
   {
-    id: 1,
-    title: "Expresso Tradicional",
-    description: "O tradicional café feito com água quente e grãos moídos",
+    id: 3,
+    title: "Expresso Cremoso",
+    description: "Café expresso tradicional com espuma cremosa",
     price: 9.9,
     sizes: ["114ml", "140ml", "227ml"],
     type: 1,
     type_label: "Tradicional",
-    image: TradicionalImage,
+    image: CremosoImage,
   },
   {
     id: 6,

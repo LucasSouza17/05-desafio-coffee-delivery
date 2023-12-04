@@ -1,6 +1,6 @@
 import TradicionalImage from "../assets/expresso.png";
 import AmericanoImage from "../assets/americano.png";
-import CremosoImage from "../assets/expressocremoso.png";
+import CremosoImage from "../assets/cremoso.png";
 import LatteImage from "../assets/latte.png";
 import GeladoImage from "../assets/gelado.png";
 

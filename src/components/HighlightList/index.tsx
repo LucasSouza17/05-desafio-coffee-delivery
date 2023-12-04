@@ -1,5 +1,7 @@
 import { FlatList } from "react-native";
 import Animated, {
+  SlideInLeft,
+  SlideInRight,
   interpolate,
   useAnimatedScrollHandler,
   useAnimatedStyle,
@@ -30,15 +32,19 @@ export function HighlightList() {
         marginLeft: 0,
         paddingHorizontal: 32,
         paddingTop: 48,
-        alignItems: 'center'
+        alignItems: "center",
       }}
       snapToAlignment="start"
       decelerationRate="fast"
-      snapToInterval={176}
+      snapToInterval={160}
       onScroll={scrollHandler}
       showsHorizontalScrollIndicator={false}
       renderItem={({ item, index }) => {
-        return <CoffeeCardHighlight coffee={item} index={index} scrollX={scrollX} />;
+        return (
+          <Animated.View entering={index === 0 ? SlideInLeft.duration(800).delay(300).springify() : SlideInRight.duration(1000).delay(200)}>
+            <CoffeeCardHighlight coffee={item} index={index} scrollX={scrollX} />
+          </Animated.View>
+        );
       }}
     />
   );

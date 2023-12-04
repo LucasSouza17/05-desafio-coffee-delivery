@@ -3,8 +3,8 @@ import { THEME } from "../../styles/theme";
 
 export const styles = StyleSheet.create({
   container: {
-    position: 'relative',
-    overflow: 'visible',
+    position: "relative",
+    overflow: "visible",
 
     width: 208,
     height: 300,
@@ -24,6 +24,16 @@ export const styles = StyleSheet.create({
     borderBottomLeftRadius: 36,
   },
   image: {
-    alignSelf: 'center',
+    alignSelf: "center",
+  },
+  content: {
+    marginTop: 8,
+    alignItems: "center",
+  },
+  textsContainer: {
+    marginTop: 14,
+    gap: 4,
+    alignItems: "center",
+    marginBottom: 18,
   },
 });
