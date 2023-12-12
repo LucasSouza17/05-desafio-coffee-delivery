@@ -1,53 +1,39 @@
-import { ScrollView, SectionList, SectionListProps, Text, View } from "react-native";
+import { SectionList, SectionListProps } from "react-native";
 import { COFFEES } from "../../data/coffees";
-import { CoffeeData } from "../../@types/coffee";
-import { useEffect, useState } from "react";
+import { CoffeeCard } from "../CoffeeCard";
+import { styles } from "./styles";
+import Animated, { SlideInDown } from "react-native-reanimated";
+import { forwardRef, useRef } from "react";
 
 type Props = Omit<SectionListProps<any>, "sections">;
 
-export function CoffeeList({ scrollEnabled, ...rest }: Props) {
-  const [isScrollEnabled, setIsScrollEnabled] = useState(false);
-
-  useEffect(() => {
-    setTimeout(() => {
-      if (scrollEnabled === false) {
-        setIsScrollEnabled(true);
-      } else {
-        setIsScrollEnabled(false);
-      }
-    }, 1000);
-  }, [scrollEnabled]);
+export const CoffeeList = forwardRef(({...rest}: Props, ref) => {
+  const sectionRef = useRef<any[]>([]);
 
   return (
     <SectionList
+      ref={ref as any}
       keyExtractor={(item) => String(item.id)}
       sections={COFFEES}
       contentContainerStyle={{ flex: 1 }}
-      scrollEnabled={isScrollEnabled}
+      style={{ paddingHorizontal: 32, gap: 32, paddingTop: 16 }}
       renderSectionHeader={({ section: { title } }) => (
-        <View>
-          <Text>{title}</Text>
-          <Text>{title}</Text>
-          <Text>{title}</Text>
-          <Text>{title}</Text>
-          <Text>{title}</Text>
-          <Text>{title}</Text>
-          <Text>{title}</Text>
-        </View>
+        <Animated.Text
+          ref={(element) =>
+            sectionRef?.current ? (sectionRef.current[title] = element) : null
+          }
+          entering={SlideInDown.duration(1500)}
+          style={styles.sectionTitle}
+        >
+          {title}
+        </Animated.Text>
       )}
-      renderItem={({ item }) => (
-        <View>
-          <Text style={{ color: "#000" }}>{item.title}</Text>
-          <Text style={{ color: "#000" }}>{item.title}</Text>
-          <Text style={{ color: "#000" }}>{item.title}</Text>
-          <Text style={{ color: "#000" }}>{item.title}</Text>
-          <Text style={{ color: "#000" }}>{item.title}</Text>
-          <Text style={{ color: "#000" }}>{item.title}</Text>
-          <Text style={{ color: "#000" }}>{item.title}</Text>
-          <Text style={{ color: "#000" }}>{item.title}</Text>
-        </View>
+      renderItem={({ item, index }) => (
+        <Animated.View entering={SlideInDown.duration(1500)}>
+          <CoffeeCard coffee={item} />
+        </Animated.View>
       )}
       {...rest}
     />
   );
-}
+});

@@ -1,8 +1,8 @@
-import { View, Text, Image, Dimensions } from "react-native";
+import { useRef, useState } from "react";
+import { View, Text, Image, SectionList } from "react-native";
 import Animated, {
   SlideInUp,
   interpolateColor,
-  runOnJS,
   useAnimatedScrollHandler,
   useAnimatedStyle,
   useSharedValue,
@@ -10,45 +10,30 @@ import Animated, {
 
 import { Header } from "../../components/Header";
 import { Input } from "../../components/Input";
+import { HighlightList } from "../../components/HighlightList";
+import { CoffeeList } from "../../components/CoffeeList";
+import { CoffeeListHeader } from "../../components/CoffeeListHeader";
+
+import CoffeeBeans from "../../assets/coffeebeans.png";
 
 import { THEME } from "../../styles/theme";
 import { styles } from "./styles";
+import { COFFEES } from "../../data/coffees";
 
-import CoffeeBeans from "../../assets/coffeebeans.png";
-import { useRef, useState } from "react";
-import { HighlightList } from "../../components/HighlightList";
-import { Tag } from "../../components/Tag";
-import { CoffeeList } from "../../components/CoffeeList";
-import { Gesture, GestureDetector } from "react-native-gesture-handler";
+const ITEM_HEIGHT = 180
+const HEADER_HEIGHT = 540
 
 export function Home() {
-  const [search, setSearch] = useState<string>("");
-  const [scrollEnabled, setScrollEnabled] = useState(true);
-  const scrollRef = useRef<Animated.ScrollView>(null);
-
   const scrollY = useSharedValue(0);
+  const flatListRef = useRef<any>(null);
+  const sectionListRef = useRef<any>(null);
 
-  function handleEnableScroll() {
-    setScrollEnabled(true);
-  }
-
-  function handleDisableScroll() {
-    setScrollEnabled(false);
-  }
-
-  function handleScrollToTop() {
-    scrollRef.current?.scrollTo({ x: 0, y: 0, animated: true });
-  }
+  const [search, setSearch] = useState<string>("");
+  const [selectedFilterByScroll, setSelectedFilterByScroll] = useState<string>("");
 
   const scrollHandler = useAnimatedScrollHandler({
     onScroll: (event) => {
       scrollY.value = event.contentOffset.y;
-      ("worklet");
-      if (event.contentOffset.y >= 400) {
-        runOnJS(handleDisableScroll)();
-      } else {
-        runOnJS(handleEnableScroll)();
-      }
     },
   });
 
@@ -62,92 +47,68 @@ export function Home() {
     };
   });
 
-  const onPan = Gesture.Pan().onUpdate((event) => {
-    const moveToTop = event.translationY > 0;
+  function onSelectFilterByScrollingSectionList(titleList: string) {
+    setSelectedFilterByScroll(titleList)
+  }
 
-    if (moveToTop) {
-      ("worklet");
-      runOnJS(handleScrollToTop)();
+  const getFlatListOffset = (selectedIndex: number) => {
+    let offset = 0;
+
+    for (let i = 0; i < selectedIndex; i++) {
+      offset += COFFEES[i].data.length * ITEM_HEIGHT; // Ajuste conforme necessário
     }
-  });
+
+    return offset + HEADER_HEIGHT;
+  };
+
+  const handleScrollToCoffeeSection = (sectionIndex: number) => {
+    const offset = getFlatListOffset(sectionIndex);
+    flatListRef.current?.scrollToOffset({ offset, animated: true });
+  };
 
   return (
     <View style={styles.container}>
-      <Animated.ScrollView
-        ref={scrollRef}
-        stickyHeaderIndices={[0]}
+      <Header animatedScrollY={scrollY} />
+
+      <Animated.FlatList
+        ref={flatListRef}
         onScroll={scrollHandler}
-        scrollEventThrottle={16}
-        snapToAlignment="start"
-        nestedScrollViews
-        decelerationRate="fast"
-        snapToInterval={Dimensions.get("window").height / 1.75}
-        showsVerticalScrollIndicator={false}
-        scrollEnabled={scrollEnabled}
-      >
-        {/* Header (Localização & Carrinho) */}
-        <Header animatedScrollY={scrollY} />
+        stickyHeaderIndices={[1]}
+        data={["0", "1", "2"]}
+        renderItem={({ index }) => {
+          if (index === 0)
+            return (
+              <View>
+                {/* Seção de pesquisa */}
+                <Animated.View
+                  style={[styles.searchContainer, searchContainerStylesAnimated]}
+                  entering={SlideInUp.duration(400).stiffness(1)}
+                >
+                  <Text style={styles.searchTitle}>
+                    Encontre o café perfeito para qualquer hora do dia
+                  </Text>
+                  <View style={{ position: "relative" }}>
+                    <Input
+                      placeholder="Pesquisar"
+                      value={search}
+                      onChangeText={(text) => setSearch(text)}
+                    />
+                    <Image source={CoffeeBeans} style={styles.coffeeBeansImage} />
+                  </View>
+                </Animated.View>
 
-        <View>
-          {/* Seção de pesquisa */}
-          <Animated.View
-            style={[styles.searchContainer, searchContainerStylesAnimated]}
-            entering={SlideInUp.duration(400).stiffness(1)}
-          >
-            <Text style={styles.searchTitle}>
-              Encontre o café perfeito para qualquer hora do dia
-            </Text>
-            <View style={{ position: "relative" }}>
-              <Input
-                placeholder="Pesquisar"
-                value={search}
-                onChangeText={(text) => setSearch(text)}
-              />
-              <Image source={CoffeeBeans} style={styles.coffeeBeansImage} />
-            </View>
-          </Animated.View>
-
-          {/* Lista dos cafés em destaque */}
-          <HighlightList />
-        </View>
-
-        <GestureDetector gesture={onPan}>
-          <View
-            style={{
-              backgroundColor: THEME.COLORS.BASE_GRAY_900,
-              paddingHorizontal: 32,
-              paddingVertical: 16,
-              gap: 12,
-              borderBottomWidth: 1,
-              borderBottomColor: THEME.COLORS.BASE_GRAY_800,
-              shadowColor: "#000",
-              shadowOffset: {
-                width: 0,
-                height: 1,
-              },
-              shadowOpacity: 0.05,
-              shadowRadius: 0.8,
-
-              elevation: 3,
-            }}
-          >
-            <Text
-              style={{
-                color: THEME.COLORS.BASE_GRAY_300,
-                fontFamily: THEME.FONTS.BOLD_BALOO2,
-                fontSize: 16,
-              }}
-            >
-              Nossos cafés
-            </Text>
-            <View style={{ alignItems: "flex-start", flexDirection: "row", gap: 8 }}>
-              <Tag label="Tradicionais" />
-              <Tag label="Doces" />
-            </View>
-          </View>
-        </GestureDetector>
-        <CoffeeList scrollEnabled={scrollEnabled} />
-      </Animated.ScrollView>
+                {/* Lista dos cafés em destaque */}
+                <HighlightList />
+              </View>
+            );
+          if (index === 1)
+            return <CoffeeListHeader onChangeFilter={handleScrollToCoffeeSection} selectedFilterByScrollIndex={selectedFilterByScroll} />;
+          if (index === 2) return (
+            <CoffeeList ref={sectionListRef} onViewableItemsChanged={({viewableItems}) => {onSelectFilterByScrollingSectionList(viewableItems[1].section.title), console.log(viewableItems[0].index)}} />
+          );
+          return <></>;
+        }}
+      />
     </View>
   );
 }
