@@ -1,14 +1,24 @@
-import { SectionList, SectionListProps } from "react-native";
+import { forwardRef, useRef } from "react";
+import { SectionList, SectionListProps, TouchableOpacity } from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import Animated, { SlideInDown } from "react-native-reanimated";
+const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity);
+
 import { COFFEES } from "../../data/coffees";
 import { CoffeeCard } from "../CoffeeCard";
+
 import { styles } from "./styles";
-import Animated, { SlideInDown } from "react-native-reanimated";
-import { forwardRef, useRef } from "react";
 
 type Props = Omit<SectionListProps<any>, "sections">;
 
 export const CoffeeList = forwardRef(({...rest}: Props, ref) => {
   const sectionRef = useRef<any[]>([]);
+
+  const {navigate} = useNavigation();
+
+  function handleGoToDetails(coffeeId: number) {
+    navigate("details", { id: coffeeId });
+  }
 
   return (
     <SectionList
@@ -28,10 +38,10 @@ export const CoffeeList = forwardRef(({...rest}: Props, ref) => {
           {title}
         </Animated.Text>
       )}
-      renderItem={({ item, index }) => (
-        <Animated.View entering={SlideInDown.duration(1500)}>
+      renderItem={({ item }) => (
+        <AnimatedTouchableOpacity entering={SlideInDown.duration(1500)} onPress={() => handleGoToDetails(item.id)} activeOpacity={0.75}>
           <CoffeeCard coffee={item} />
-        </Animated.View>
+        </AnimatedTouchableOpacity>
       )}
       {...rest}
     />

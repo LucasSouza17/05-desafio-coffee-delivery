@@ -2,7 +2,8 @@ import { StyleSheet } from "react-native";
 import { THEME } from "../../styles/theme";
 
 export const styles = StyleSheet.create({
-  title: {
-    fontFamily: THEME.FONTS.BOLD_BALOO2,
+  container: {
+    flex: 1,
+    backgroundColor: THEME.COLORS.BASE_GRAY_900,
   },
 });

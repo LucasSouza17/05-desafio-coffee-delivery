@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { View, Text, Image, SectionList } from "react-native";
+import { View, Text, Image } from "react-native";
 import Animated, {
   SlideInUp,
   interpolateColor,
@@ -20,8 +20,8 @@ import { THEME } from "../../styles/theme";
 import { styles } from "./styles";
 import { COFFEES } from "../../data/coffees";
 
-const ITEM_HEIGHT = 180
-const HEADER_HEIGHT = 540
+const ITEM_HEIGHT = 180;
+const HEADER_HEIGHT = 540;
 
 export function Home() {
   const scrollY = useSharedValue(0);
@@ -48,7 +48,7 @@ export function Home() {
   });
 
   function onSelectFilterByScrollingSectionList(titleList: string) {
-    setSelectedFilterByScroll(titleList)
+    setSelectedFilterByScroll(titleList);
   }
 
   const getFlatListOffset = (selectedIndex: number) => {
@@ -102,10 +102,21 @@ export function Home() {
               </View>
             );
           if (index === 1)
-            return <CoffeeListHeader onChangeFilter={handleScrollToCoffeeSection} selectedFilterByScrollIndex={selectedFilterByScroll} />;
-          if (index === 2) return (
-            <CoffeeList ref={sectionListRef} onViewableItemsChanged={({viewableItems}) => {onSelectFilterByScrollingSectionList(viewableItems[1].section.title), console.log(viewableItems[0].index)}} />
-          );
+            return (
+              <CoffeeListHeader
+                onChangeFilter={handleScrollToCoffeeSection}
+                selectedFilterByScrollIndex={selectedFilterByScroll}
+              />
+            );
+          if (index === 2)
+            return (
+              <CoffeeList
+                ref={sectionListRef}
+                onViewableItemsChanged={({ viewableItems }) => {
+                  onSelectFilterByScrollingSectionList(viewableItems[1].section.title);
+                }}
+              />
+            );
           return <></>;
         }}
       />
