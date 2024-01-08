@@ -26,7 +26,7 @@ export const CoffeeList = forwardRef(({...rest}: Props, ref) => {
       keyExtractor={(item) => String(item.id)}
       sections={COFFEES}
       contentContainerStyle={{ flex: 1 }}
-      style={{ paddingHorizontal: 32, gap: 32, paddingTop: 16 }}
+      style={{ paddingHorizontal: 32, gap: 32, paddingTop: 16, paddingBottom: 80 }}
       renderSectionHeader={({ section: { title } }) => (
         <Animated.Text
           ref={(element) =>

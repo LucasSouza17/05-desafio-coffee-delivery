@@ -41,5 +41,6 @@ export const styles = StyleSheet.create({
   description: {
     fontSize: 12,
     color: THEME.COLORS.BASE_GRAY_400,
+    fontFamily: THEME.FONTS.REGULAR
   },
 });

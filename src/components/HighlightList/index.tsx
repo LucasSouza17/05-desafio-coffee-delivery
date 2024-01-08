@@ -54,7 +54,7 @@ export function HighlightList() {
                 : SlideInRight.duration(1000).delay(200)
             }
             onPress={() => handleGoToDetails(item.id)}
-            activeOpacity={0.9}
+            activeOpacity={0.95}
           >
             <CoffeeCardHighlight coffee={item} index={index} scrollX={scrollX} />
           </AnimatedTouchableOpacity>

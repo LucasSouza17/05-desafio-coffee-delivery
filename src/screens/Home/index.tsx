@@ -19,11 +19,17 @@ import CoffeeBeans from "../../assets/coffeebeans.png";
 import { THEME } from "../../styles/theme";
 import { styles } from "./styles";
 import { COFFEES } from "../../data/coffees";
+import { ToastCart } from "../../components/ToastCart";
+import { useCart } from "../../hooks/useCart";
 
 const ITEM_HEIGHT = 180;
 const HEADER_HEIGHT = 540;
 
 export function Home() {
+  const {toastCartVisible} = useCart();
+
+  const arrayToast = [];
+
   const scrollY = useSharedValue(0);
   const flatListRef = useRef<any>(null);
   const sectionListRef = useRef<any>(null);
@@ -113,13 +119,17 @@ export function Home() {
               <CoffeeList
                 ref={sectionListRef}
                 onViewableItemsChanged={({ viewableItems }) => {
-                  onSelectFilterByScrollingSectionList(viewableItems[1].section.title);
+                  onSelectFilterByScrollingSectionList(viewableItems[1]?.section?.title);
                 }}
               />
             );
           return <></>;
         }}
       />
+      
+      {!!toastCartVisible && (
+        <ToastCart data={{amount: toastCartVisible.amount, size: toastCartVisible.size, title: toastCartVisible.title}} />
+      )}
     </View>
   );
 }

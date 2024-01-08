@@ -36,7 +36,7 @@ export function NavHeader({ variant = "dark", title = "", hasCart = false }: Pro
 
         <Text style={[styles.title, { color }]}>{title}</Text>
 
-        {hasCart ? <Cart variant="purple" /> : <View />}
+        {hasCart ? <Cart variant="purple" /> : <View style={{width: 20, height: 20}} />}
       </View>
     </View>
   );

@@ -16,9 +16,9 @@ export const styles = StyleSheet.create({
   },
   searchTitle: {
     fontSize: 20,
-    fontFamily: "Baloo2_700Bold",
     lineHeight: 24,
     color: THEME.COLORS.BASE_WHITE,
+    fontFamily: THEME.FONTS.BOLD_BALOO2
   },
   coffeeBeansImage: {
     position: "absolute",

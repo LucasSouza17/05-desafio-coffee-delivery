@@ -1,162 +1,185 @@
-import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
-import { styles } from "./styles";
+import { useEffect, useState } from "react";
+import uuid from "react-native-uuid";
+import { ActivityIndicator, Image, ScrollView, Text, View } from "react-native";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import Animated, { SlideInDown, SlideInUp } from "react-native-reanimated";
+import { Audio } from "expo-av";
+import * as Haptics from "expo-haptics";
+
 import { NavHeader } from "../../components/NavHeader";
-import { THEME } from "../../styles/theme";
 import { Tag } from "../../components/Tag";
 import { CoffeeTitle } from "../../components/CoffeeTitle";
 import { CoffeePrice } from "../../components/CoffeePrice";
 import { CoffeeDescription } from "../../components/CoffeeDescription";
+import { SizeButton } from "../../components/SizeButton";
+import { Button } from "../../components/Button";
+import { AddRemoveButton } from "../../components/AddRemoveButton";
+import { Smoke } from "../../components/Smoke";
+
+import { styles } from "./styles";
+import { THEME } from "../../styles/theme";
 
 import CoffeeDetails from "../../assets/coffeedetails.png";
-import Smoke from "../../assets/smoke.svg";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Minus, Plus } from "phosphor-react-native";
+import { COFFEES } from "../../data/coffees";
+import { CoffeeData } from "../../@types/coffee";
+import { useCart } from "../../hooks/useCart";
+
+interface Params {
+  id: number;
+}
 
 export function Details() {
   const { bottom } = useSafeAreaInsets();
 
+  const { addCart } = useCart();
+
+  const navigation = useNavigation();
+  const route = useRoute();
+  const { id } = route.params as Params;
+
+  const [isLoading, setIsLoading] = useState(true);
+  const [coffee, setCoffee] = useState<CoffeeData | null>(null);
+  const [sizeSelected, setSizeSelected] = useState("");
+  const [coffeeAmount, setCoffeeAmount] = useState(1);
+
+  function handleIncreaseCoffee() {
+    setCoffeeAmount((amount) => amount + 1);
+  }
+
+  function handleDecreaseCoffee() {
+    if (coffeeAmount === 1) {
+      return;
+    } else {
+      setCoffeeAmount((amount) => amount - 1);
+    }
+  }
+
+  function handleSelectSizeCoffee(size: string) {
+    setSizeSelected(size);
+  }
+
+  async function playSound() {
+    const file = require("../../assets/addcart.mp3");
+    const { sound } = await Audio.Sound.createAsync(file, { shouldPlay: true });
+
+    await sound.setPositionAsync(100);
+    await sound.setVolumeAsync(0.10)
+    await sound.playAsync();
+  }
+
+  async function vibratePhone() {
+    await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+  }
+
+  function handleAddCoffeeToCart() {
+    if (!coffee) {
+      return;
+    }
+
+    const cartData = {
+      id: uuid.v4().toString(),
+      coffeeId: coffee.id,
+      title: coffee.title,
+      size: sizeSelected,
+      image: coffee.image,
+      price: coffee.price,
+      amount: coffeeAmount,
+    };
+
+    addCart(cartData);
+    playSound();
+    vibratePhone();
+    navigation.goBack();
+  }
+
+  useEffect(() => {
+    const coffees = COFFEES.flatMap((coffee) => coffee.data);
+    const coffeeSelected = coffees.filter((item) => item.id === id)[0];
+    setCoffee(coffeeSelected);
+    setIsLoading(false);
+  }, []);
+
+  if (isLoading || !coffee) {
+    return (
+      <View
+        style={{
+          flex: 1,
+          alignItems: "center",
+          justifyContent: "center",
+          backgroundColor: THEME.COLORS.BASE_GRAY_100,
+        }}
+      >
+        <ActivityIndicator color={THEME.COLORS.BASE_GRAY_900} size="small" />
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       <NavHeader hasCart />
-      <ScrollView
-        contentContainerStyle={{ flex: 1, backgroundColor: THEME.COLORS.BASE_GRAY_100 }}
-      >
-        <View
-          style={{
-            paddingHorizontal: 32,
-            marginTop: 12,
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "flex-end",
-          }}
+
+      <ScrollView contentContainerStyle={styles.scrollViewContainer}>
+        <Animated.View
+          style={{ flex: 1, zIndex: 1 }}
+          entering={SlideInUp.stiffness(1).duration(700)}
         >
-          <View style={{ alignItems: "flex-start", gap: 12 }}>
-            <Tag label="ESPECIAL" size="md" variant="dark" />
-            <CoffeeTitle label="Irlandês" size="lg" variant="light" />
+          <View style={styles.mainContent}>
+            <View style={styles.mainContentInfo}>
+              <Tag label={coffee.type_label.toUpperCase()} size="md" variant="dark" />
+              <CoffeeTitle label={coffee.title} size="lg" variant="light" />
+            </View>
+            <CoffeePrice variant="yellow" price={coffee.price} size="xl" />
           </View>
-          <CoffeePrice variant="yellow" price={9.9} size="xl" />
-        </View>
 
-        <View style={{ paddingHorizontal: 32, marginTop: 20 }}>
-          <CoffeeDescription
-            label="Bebida a base de café, uísque irlandês, açúcar e chantilly"
-            size="md"
-            variant="gray_500"
-          />
-        </View>
+          <View style={styles.descriptionContainer}>
+            <CoffeeDescription label={coffee.description} size="md" variant="gray_500" />
+          </View>
 
-        <View
-          style={{
-            position: "relative",
-            flex: 1,
-            alignItems: "center",
-            justifyContent: "flex-end",
-            zIndex: 10,
-          }}
-        >
-          <Smoke
-            width={70}
-            height={150}
-            style={{ position: "absolute", top: 36, zIndex: 10 }}
-          />
-          <Image
-            source={CoffeeDetails}
-            style={{ width: 355, height: 320, marginBottom: -60 }}
-          />
-        </View>
+          <View style={styles.imageContainer}>
+            <Smoke />
+            <Image
+              source={CoffeeDetails}
+              style={{ width: 355, height: 320, marginBottom: -60 }}
+            />
+          </View>
+        </Animated.View>
 
-        <View
-          style={{
-            backgroundColor: THEME.COLORS.BASE_GRAY_900,
-            paddingBottom: bottom,
-            paddingTop: 42,
-            paddingHorizontal: 32,
-          }}
+        <Animated.View
+          entering={SlideInDown.stiffness(1).duration(800)}
+          style={[styles.buyContainer, { paddingBottom: bottom }]}
         >
           <View style={{ gap: 8 }}>
             <Text style={{ fontSize: 14, color: THEME.COLORS.BASE_GRAY_400 }}>
               Selecione o tamanho:
             </Text>
-            <View
-              style={{ flexDirection: "row", gap: 8, justifyContent: "space-between" }}
-            >
-              <View
-                style={{
-                  width: 105,
-                  height: 40,
-                  backgroundColor: THEME.COLORS.BASE_GRAY_700,
-                  borderRadius: 6,
-                  alignItems: "center",
-                  justifyContent: "center"
-                }}
-              >
-                <Text style={{color: THEME.COLORS.BASE_GRAY_300}}>114ml</Text>
-              </View>
-              <View
-                style={{
-                  width: 105,
-                  height: 40,
-                  backgroundColor: THEME.COLORS.BASE_GRAY_700,
-                  borderRadius: 6,
-                  alignItems: "center",
-                  justifyContent: "center"
-                }}
-              >
-                <Text style={{color: THEME.COLORS.BASE_GRAY_300}}>140ml</Text>
-              </View>
-              <View
-                style={{
-                  width: 105,
-                  height: 40,
-                  backgroundColor: THEME.COLORS.BASE_GRAY_700,
-                  borderRadius: 6,
-                  alignItems: "center",
-                  justifyContent: "center"
-                }}
-              >
-                <Text style={{color: THEME.COLORS.BASE_GRAY_300}}>227ml</Text>
-              </View>
+            <View style={styles.sizesContainer}>
+              {coffee.sizes.map((size) => (
+                <SizeButton
+                  key={size}
+                  label={size}
+                  isSelected={size === sizeSelected}
+                  onPress={() => handleSelectSizeCoffee(size)}
+                />
+              ))}
             </View>
           </View>
 
-          <View style={{marginTop: 20, backgroundColor: THEME.COLORS.BASE_GRAY_700, padding: 8, gap: 16, borderRadius: 6, flexDirection: "row", alignItems: "center"}}>
-            <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
-              <View
-                style={{
-                  width: 36,
-                  height: 36,
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <Minus color={THEME.COLORS.BRAND_PURPLE} size={20} weight="bold" />
-              </View>
-              <View
-                style={{
-                  height: 36,
-                  width: 20,
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <Text style={{ fontSize: 16 }}>1</Text>
-              </View>
-              <View
-                style={{
-                  width: 36,
-                  height: 36,
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <Plus color={THEME.COLORS.BRAND_PURPLE} size={20} weight="bold" />
-              </View>
+          <View style={styles.addCartContainer}>
+            <AddRemoveButton
+              onPressAdd={handleIncreaseCoffee}
+              onPressRemove={handleDecreaseCoffee}
+              value={coffeeAmount}
+            />
+            <View style={{ flex: 1 }}>
+              <Button
+                label="ADICIONAR"
+                disabled={!sizeSelected}
+                onPress={handleAddCoffeeToCart}
+              />
             </View>
-            <TouchableOpacity style={{flex: 1, paddingHorizontal: 8, paddingVertical: 12, alignItems: "center", justifyContent: "center", backgroundColor: THEME.COLORS.BRAND_PURPLE_DARK, borderRadius: 6}}>
-              <Text style={{fontWeight: "700", fontFamily: THEME.FONTS.BOLD_BALOO2, fontSize: 14, color: THEME.COLORS.BASE_WHITE}}>ADICIONAR</Text>
-            </TouchableOpacity>
           </View>
-        </View>
+        </Animated.View>
       </ScrollView>
     </View>
   );

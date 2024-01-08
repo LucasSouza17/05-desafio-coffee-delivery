@@ -18,6 +18,7 @@ export const styles = StyleSheet.create({
     flex: 1,
     height: 42,
 
-    color: THEME.COLORS.BASE_GRAY_700
+    color: THEME.COLORS.BASE_GRAY_700,
+    fontFamily: THEME.FONTS.REGULAR
   }
 });
