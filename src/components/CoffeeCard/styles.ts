@@ -1,46 +1,47 @@
-import { StyleSheet } from "react-native";
+import styled from 'styled-components/native';
 import { THEME } from "../../styles/theme";
 
-export const styles = StyleSheet.create({
-  container: {
-    paddingLeft: 8,
-    paddingRight: 16,
-    paddingVertical: 6,
+export const Container = styled.View`
+  padding-left: 8px;
+  padding-right: 16px;
+  padding-vertical: 6px;
+  background-color: ${THEME.COLORS.BASE_GRAY_800};
+  border-bottom-left-radius: 36px;
+  border-bottom-right-radius: 6px;
+  border-top-left-radius: 6px;
+  border-top-right-radius: 36px;
+  border-width: 1px;
+  border-color: ${THEME.COLORS.BASE_GRAY_700};
+`
 
-    backgroundColor: THEME.COLORS.BASE_GRAY_800,
+export const Content = styled.View`
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  padding-vertical: 10px;
+`
 
-    borderBottomLeftRadius: 36,
-    borderBottomRightRadius: 6,
-    borderTopLeftRadius: 6,
-    borderTopRightRadius: 36,
+export const Image = styled.Image`
+  width: 96px;
+  height: 96px;
+`
 
-    borderWidth: 1,
-    borderColor: THEME.COLORS.BASE_GRAY_700,
-  },
-  content: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-    paddingVertical: 10,
-  },
-  image: {
-    width: 96,
-    height: 96,
-    marginTop: -46,
-  },
-  contentInfo: {
-    flexShrink: 1,
-    gap: 8,
-  },
-  title: {
-    fontSize: 16,
-    fontFamily: THEME.FONTS.BOLD_BALOO2,
-    fontWeight: "700",
-    color: THEME.COLORS.BASE_GRAY_200,
-  },
-  description: {
-    fontSize: 12,
-    color: THEME.COLORS.BASE_GRAY_400,
-    fontFamily: THEME.FONTS.REGULAR
-  },
-});
+export const ContentInfo = styled.View`
+  flex-shrink: 1;
+  gap: 8px;
+`
+
+export const TitleDescriptionContainer = styled.View``
+
+export const Title = styled.Text`
+  font-size: 16px;
+  font-family: ${THEME.FONTS.BOLD_BALOO2};
+  font-weight: 700;
+  color: ${THEME.COLORS.BASE_GRAY_200};
+`
+
+export const Description = styled.Text`
+  font-size: 12px;
+  color: ${THEME.COLORS.BASE_GRAY_400};
+  font-family: ${THEME.FONTS.REGULAR};
+`

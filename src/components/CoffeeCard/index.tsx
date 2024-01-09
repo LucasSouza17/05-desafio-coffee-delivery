@@ -1,30 +1,27 @@
-import { View, Image, Text } from "react-native";
 
-import CoffeeImage from "../../assets/cubano.png";
-
-import { styles } from "./styles";
-import { CoffeePrice } from "../CoffeePrice";
-import { CoffeeData } from "../../@types/coffee";
+import { CoffeePrice } from "../CoffeePrice"
+import { CoffeeData } from "../../@types/coffee"
+import { Container, Content, ContentInfo, Description, Image, Title, TitleDescriptionContainer } from "./styles"
 
 type Props = {
   coffee: CoffeeData
 }
 
-export function CoffeeCard({coffee}: Props) {
+export function CoffeeCard({ coffee }: Props) {
   return (
-    <View style={styles.container}>
-      <View style={styles.content}>
-        <Image source={coffee.image} style={styles.image} />
-        <View style={styles.contentInfo}>
-          <View>
-            <Text style={styles.title}>{coffee.title}</Text>
-            <Text style={styles.description}>
+    <Container >
+      <Content >
+        <Image source={coffee.image} />
+        <ContentInfo >
+          <TitleDescriptionContainer>
+            <Title >{coffee.title}</Title>
+            <Description >
               {coffee.description}
-            </Text>
-          </View>
+            </Description>
+          </TitleDescriptionContainer>
           <CoffeePrice price={coffee.price} />
-        </View>
-      </View>
-    </View>
-  );
+        </ContentInfo>
+      </Content>
+    </Container>
+  )
 }
